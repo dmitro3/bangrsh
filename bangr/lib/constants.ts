@@ -10,3 +10,8 @@ export const CHAIN_NAMES: { [key: number]: string } = {
   97: "BNB Testnet",
   56: "BNB Chain",
 };
+
+export const DEFAULT_PRICES = {
+  YES_SHARE: 50, // Default 50 cents
+  NO_SHARE: 50, // Default 50 cents
+};
