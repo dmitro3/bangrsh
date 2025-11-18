@@ -6,7 +6,14 @@ interface BangrCardProps {
   username: string;
   displayName: string;
   tweetText: string;
-  tweetImage?: string;
+  tweetImage?: string | null;
+  profileImage?: string | null;
+  tweetMetrics?: {
+    views: number;
+    likes: number;
+    retweets: number;
+    replies: number;
+  };
   yesPrice: number;
   noPrice: number;
   volume: string;
@@ -38,7 +45,9 @@ const BangrCard: React.FC<BangrCardProps> = ({
   username,
   displayName,
   tweetText,
-  tweetImage = "https://placehold.co/400x250/000000/FFFFFF?text=Tweet+Image",
+  tweetImage,
+  profileImage,
+  tweetMetrics,
   yesPrice,
   noPrice,
   volume,
@@ -48,6 +57,12 @@ const BangrCard: React.FC<BangrCardProps> = ({
   trendingMetric,
   targetValue
 }) => {
+  // Format numbers for display
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toString();
+  };
   const metricColor = metricStrokeColors[trendingMetric] || "#000000";
   const metricLabel = trendingMetric.toUpperCase();
 
@@ -97,11 +112,9 @@ const BangrCard: React.FC<BangrCardProps> = ({
         {/* Tweet Author */}
         <div className="flex items-center gap-2 mb-3">
           <img
-            src={`https://placehold.co/48x48/1DA1F2/FFFFFF?text=${displayName.charAt(
-              0
-            )}`}
+            src={profileImage || `https://placehold.co/48x48/1DA1F2/FFFFFF?text=${displayName.charAt(0)}`}
             alt={displayName}
-            className="w-12 h-12 nb-border"
+            className="w-12 h-12 rounded-full nb-border object-cover"
           />
           <div>
             <div className="font-bold">{displayName}</div>
@@ -110,31 +123,35 @@ const BangrCard: React.FC<BangrCardProps> = ({
         </div>
         {/* Tweet Text */}
         <p className="text-sm mb-3">{tweetText}</p>
-        {/* Tweet Image */}
-        <img
-          src={tweetImage}
-          alt="Tweet"
-          className="w-full h-auto nb-border mb-3"
-        />
+        {/* Tweet Image - Pinterest style: only show if exists */}
+        {tweetImage && (
+          <img
+            src={tweetImage}
+            alt="Tweet"
+            className="w-full h-auto nb-border mb-3 object-cover"
+          />
+        )}
         {/* Tweet Stats */}
-        <div className="grid grid-cols-4 gap-1 mt-2 text-[11px] text-neutral-700">
-          <div className="text-center">
-            <div className="font-semibold">1.2K</div>
-            <div>Comments</div>
+        {tweetMetrics && (
+          <div className="grid grid-cols-4 gap-1 mt-2 text-[11px] text-neutral-700">
+            <div className="text-center">
+              <div className="font-semibold">{formatNumber(tweetMetrics.replies)}</div>
+              <div>Comments</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold">{formatNumber(tweetMetrics.retweets)}</div>
+              <div>Retweets</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold">{formatNumber(tweetMetrics.likes)}</div>
+              <div>Likes</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold">{formatNumber(tweetMetrics.views)}</div>
+              <div>Views</div>
+            </div>
           </div>
-          <div className="text-center">
-            <div className="font-semibold">3.8K</div>
-            <div>Retweets</div>
-          </div>
-          <div className="text-center">
-            <div className="font-semibold">8.9K</div>
-            <div>Likes</div>
-          </div>
-          <div className="text-center">
-            <div className="font-semibold">2.5M</div>
-            <div>Views</div>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Prediction Question */}

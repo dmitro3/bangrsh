@@ -87,6 +87,12 @@ export async function POST(request: NextRequest) {
       author.avatar ||
       null;
 
+    // Extract media/images from tweet
+    const media = tweet.media || tweet.entities?.media || [];
+    const imageUrl = media.length > 0 && media[0].type === 'photo'
+      ? media[0].url || media[0].media_url_https || media[0].media_url
+      : null;
+
     // Return metrics in our expected format
     const tweetMetrics = {
       tweetId: tweet.id || tweetId,
@@ -94,6 +100,7 @@ export async function POST(request: NextRequest) {
       authorHandle: author.username || author.userName || "unknown",
       authorName: author.name || "Unknown",
       avatarUrl,
+      imageUrl,
       views,
       likes,
       retweets,

@@ -6,6 +6,7 @@ interface TweetMetricsResponse {
   authorHandle: string;
   authorName: string;
   avatarUrl?: string | null;
+  imageUrl?: string | null;
   views: number;
   likes: number;
   retweets: number;

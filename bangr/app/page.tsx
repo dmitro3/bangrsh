@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CreateMarketModal } from "@/components/CreateMarketModal";
 import { Header } from "@/components/Header";
 import { useMarkets } from "@/lib/hooks/useMarkets";
-import BangrCard from "@/components/BangrCard"; // Assuming BangrCard is default export
+import { MarketCardWithData } from "@/components/market/MarketCardWithData";
 import MarqueeTicker from "@/components/MarqueeTicker";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -75,26 +75,19 @@ export default function Home() {
             const colors = ["bg-yellow-400", "bg-green-400", "bg-blue-500", "bg-red-500"];
             const color = colors[index % colors.length];
 
-            // This is a placeholder for mapping. I need to see what `market` object contains.
-            // For now, I'll pass some values.
-              return (
-                <Link href={`/market/${market.id || market.index}`} key={market.id?.toString() || market.index} className="mb-6 break-inside-avoid block">
-                <BangrCard
-                  id={Number(market.id || market.index)}
-                  username={market.authorHandle || "unknown"}
-                  displayName={market.authorHandle || "Unknown"}
-                  tweetText={`Prediction market for @${market.authorHandle || 'unknown'}'s tweet`}
-                  yesPrice={50}
-                  noPrice={50}
-                  volume="$10"
+            return (
+              <Link
+                href={`/market/${market.id || market.index}`}
+                key={market.id?.toString() || market.index}
+                className="mb-6 break-inside-avoid block"
+              >
+                <MarketCardWithData
+                  market={market}
+                  index={index}
                   color={color}
-                  timeLeft="16h left"
-                  tag={index % 2 === 0 ? "HOT" : "NEW"}
-                  trendingMetric="views"
-                  targetValue="52.0M"
                 />
               </Link>
-              );
+            );
           })
         )}
       </main>
