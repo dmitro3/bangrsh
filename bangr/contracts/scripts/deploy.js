@@ -10,7 +10,7 @@ async function main() {
   console.log("Account balance:", (await hre.ethers.provider.getBalance(deployer.address)).toString());
 
   // USDC addresses (update these for your network)
-  const USDC_TESTNET = "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"; // BNB testnet USDC
+  const USDC_TESTNET = "0x64142706680e2707e5D23887505c5DD54855a779"; // MockUSDC on BNB testnet
   const USDC_MAINNET = "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d"; // BNB mainnet USDC
   const USDC_LOCAL = deployer.address; // For local testing, use deployer as mock USDC
 
