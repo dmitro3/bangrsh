@@ -63,14 +63,14 @@ export function PriceChart({
             <YAxis stroke="#000" domain={[yMin, yMax]} />
             <Tooltip content={<CustomTooltip />} />
             {/* Only show the active metric line */}
-            <Line
-              type="monotone"
+                <Line
+                  type="monotone"
               dataKey={activeMetric}
               stroke={metricConfig.chartColor}
               strokeWidth={3}
-              dot={false}
+                  dot={false}
               name={metricConfig.label.charAt(0).toUpperCase() + metricConfig.label.slice(1)}
-            />
+                />
           </LineChart>
         </ResponsiveContainer>
       </div>

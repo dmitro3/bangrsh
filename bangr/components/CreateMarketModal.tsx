@@ -386,8 +386,8 @@ export function CreateMarketModal({ isOpen, onClose }: CreateMarketModalProps) {
                 {previewData.text}
               </p>
 
-              {/* Quoted Tweet */}
-              {previewData.quotedTweet && (
+                  {/* Quoted Tweet */}
+                  {previewData.quotedTweet && (
                 <div className="mt-3 p-4 bg-gray-50 nb-border rounded">
                   <div className="flex items-start gap-2 mb-2">
                     {previewData.quotedTweet.avatarUrl ? (

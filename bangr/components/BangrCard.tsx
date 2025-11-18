@@ -117,7 +117,7 @@ const BangrCard: React.FC<BangrCardProps> = ({
           </div>
         </div>
 
-        {/* Tweet Author */}
+                {/* Tweet Author */}
         <div className="flex items-center gap-2 mb-3">
           <img
             src={profileImage || `https://placehold.co/48x48/1DA1F2/FFFFFF?text=${displayName.charAt(0)}`}
@@ -187,22 +187,22 @@ const BangrCard: React.FC<BangrCardProps> = ({
               <div className="font-semibold">{formatNumber(tweetMetrics.views)}</div>
               <div>Views</div>
             </div>
-          </div>
+        </div>
         )}
       </div>
 
       {/* Prediction Question */}
       <div className="p-3 border-y-2 border-black font-bold text-center text-sm bg-yellow-400 text-black font-pixel nb-scanlines relative z-10">
-        Will this hit {targetValue}{" "}
-        <span
-          className="underline"
-          style={{
+          Will this hit {targetValue}{" "}
+          <span
+            className="underline"
+            style={{
             color: metricColor,
-          }}
-        >
+            }}
+          >
           {metricLabel}
-        </span>{" "}
-        in 24h?
+          </span>{" "}
+          in 24h?
       </div>
 
       {/* Prediction Actions */}

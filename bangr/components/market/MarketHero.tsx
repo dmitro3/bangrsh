@@ -81,7 +81,7 @@ export function MarketHero({
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <span className="text-black font-bold text-base">{displayName}</span>
                 <span className="text-neutral-600 text-sm">@{username}</span>
-              </div>
+          </div>
               <p className="text-black text-sm leading-relaxed whitespace-pre-wrap break-words">{tweetText}</p>
             </div>
           </div>

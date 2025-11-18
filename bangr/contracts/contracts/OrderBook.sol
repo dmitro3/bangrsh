@@ -349,25 +349,25 @@ contract OrderBook is Ownable, ReentrancyGuard {
         Order storage makerOrder = orders[makerOrderId];
         
         {
-            MarketFactory.Market memory market = marketFactory.getMarket(makerOrder.marketId);
-            uint256 tokenId = makerOrder.isYesShare ? market.yesTokenId : market.noTokenId;
+        MarketFactory.Market memory market = marketFactory.getMarket(makerOrder.marketId);
+        uint256 tokenId = makerOrder.isYesShare ? market.yesTokenId : market.noTokenId;
 
-            // Calculate taker fee (2%)
-            uint256 takerFee = (cost * TAKER_FEE_PERCENT) / FEE_DENOMINATOR;
-            uint256 netCost = cost - takerFee;
+        // Calculate taker fee (2%)
+        uint256 takerFee = (cost * TAKER_FEE_PERCENT) / FEE_DENOMINATOR;
+        uint256 netCost = cost - takerFee;
 
-            if (takerIsBuying) {
-                // Taker buying shares from maker
-                shareToken.safeTransferFrom(address(this), taker, tokenId, shares, "");
-                collateralToken.transfer(makerOrder.maker, netCost);
-            } else {
-                // Taker selling shares to maker
-                shareToken.safeTransferFrom(taker, makerOrder.maker, tokenId, shares, "");
-                collateralToken.transfer(taker, netCost);
-            }
+        if (takerIsBuying) {
+            // Taker buying shares from maker
+            shareToken.safeTransferFrom(address(this), taker, tokenId, shares, "");
+            collateralToken.transfer(makerOrder.maker, netCost);
+        } else {
+            // Taker selling shares to maker
+            shareToken.safeTransferFrom(taker, makerOrder.maker, tokenId, shares, "");
+            collateralToken.transfer(taker, netCost);
+        }
 
-            // Distribute fees
-            _distributeFees(makerOrder.marketId, takerFee);
+        // Distribute fees
+        _distributeFees(makerOrder.marketId, takerFee);
         }
 
         emit OrderFilled(makerOrderId, taker, shares, cost);

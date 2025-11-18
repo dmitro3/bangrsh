@@ -56,16 +56,16 @@ export function useTweetMetrics(tweetId: string | undefined) {
               // If not in database, fall back to Twitter API (for backwards compatibility)
               console.log(`[useTweetMetrics] Not in database, fetching from Twitter API for tweet ${tweetId}`);
               const twitterResponse = await fetch("/api/twitter/metrics", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tweetId }),
-              });
-              
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tweetId }),
+        });
+
               if (!twitterResponse.ok) {
                 const errorData = await twitterResponse.json().catch(() => ({}));
                 throw new Error(errorData.error || "Failed to fetch metrics");
-              }
-              
+        }
+
               return twitterResponse.json();
             })
             .finally(() => {
