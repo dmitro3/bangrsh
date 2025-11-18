@@ -5,8 +5,7 @@ import { useAccount } from 'wagmi';
 import { parseUnits } from 'viem';
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { Button } from './ui/button';
-
-const USDC_ADDRESS = process.env.NEXT_PUBLIC_USDC_ADDRESS as `0x${string}`;
+import { ADDRESSES, MOCK_USDC_ABI } from '@/lib/contracts';
 
 const ERC20_ABI = [
   {
@@ -41,8 +40,9 @@ export function MintUSDCButton({ className }: { className?: string }) {
 
     try {
       setIsPending(true);
+      console.log('[MintUSDC] Minting to:', address, 'USDC address:', ADDRESSES.USDC);
       writeContract({
-        address: USDC_ADDRESS,
+        address: ADDRESSES.USDC,
         abi: ERC20_ABI,
         functionName: 'mint',
         args: [address, parseUnits('1000', 6)], // 1000 USDC with 6 decimals

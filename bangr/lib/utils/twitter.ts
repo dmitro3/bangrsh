@@ -24,42 +24,67 @@ export function extractTweetId(url: string): string | null {
  * Fetch tweet metrics from the API
  */
 export async function fetchTweetMetrics(tweetId: string) {
+  const response = await fetch("/api/twitter/metrics", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ tweetId }),
+  });
+
+  let raw: any = {};
+
   try {
-    const response = await fetch("/api/twitter/metrics", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ tweetId }),
-    });
+    raw = await response.json();
+  } catch {
+    // Ignore JSON parse errors; we'll fall back below.
+  }
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch tweet metrics");
-    }
+  // If the API explicitly reports an error or the HTTP status is not ok,
+  // return a safe fallback object instead of throwing. This keeps the
+  // dev overlay from exploding during demos and lets the UI show a
+  // friendly error message.
+  if (!response.ok || raw?.error) {
+    console.warn(
+      "[fetchTweetMetrics] Using fallback tweet data:",
+      raw?.error || response.statusText
+    );
 
-    const raw = await response.json();
-
-    // Normalise API response into the shape expected by the UI
-    // The API route returns flat metrics (views, likes, retweets, replies, ...)
-    // while the modal expects a `metrics` object.
     return {
-      tweetId: raw.tweetId ?? tweetId,
-      text: raw.text ?? "",
-      authorHandle: raw.authorHandle ?? "unknown",
-      authorName: raw.authorName ?? "Unknown",
-      avatarUrl: raw.avatarUrl ?? null,
-      quotedTweet: raw.quotedTweet ?? null,
+      tweetId,
+      text:
+        raw?.text ||
+        "Tweet data temporarily unavailable due to rate limiting or an API error.",
+      authorHandle: raw?.authorHandle || "unknown",
+      authorName: raw?.authorName || "Unknown",
+      avatarUrl: raw?.avatarUrl ?? null,
+      imageUrl: raw?.imageUrl ?? null,
+      quotedTweet: raw?.quotedTweet ?? null,
       metrics: {
-        views: raw.views ?? 0,
-        likes: raw.likes ?? 0,
-        retweets: raw.retweets ?? 0,
-        replies: raw.replies ?? 0,
+        views: raw?.views ?? 0,
+        likes: raw?.likes ?? 0,
+        retweets: raw?.retweets ?? 0,
+        replies: raw?.replies ?? 0,
       },
     };
-  } catch (error) {
-    console.error("Error fetching tweet metrics:", error);
-    throw error;
   }
+
+  // Normalise successful response into the shape expected by the UI.
+  return {
+    tweetId: raw.tweetId ?? tweetId,
+    text: raw.text ?? "",
+    authorHandle: raw.authorHandle ?? "unknown",
+    authorName: raw.authorName ?? "Unknown",
+    avatarUrl: raw.avatarUrl ?? null,
+    imageUrl: raw.imageUrl ?? null,
+    quotedTweet: raw.quotedTweet ?? null,
+    metrics: {
+      views: raw.views ?? 0,
+      likes: raw.likes ?? 0,
+      retweets: raw.retweets ?? 0,
+      replies: raw.replies ?? 0,
+    },
+  };
 }
 
 /**

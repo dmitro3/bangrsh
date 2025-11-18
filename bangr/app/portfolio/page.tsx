@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/Header";
 import { useUserPositions } from "@/lib/hooks/useUserPositions";
@@ -14,6 +14,7 @@ import { EmptyState } from "@/components/portfolio/EmptyState";
 import { ResolvedPositionCard } from "@/components/portfolio/ResolvedPositionCard";
 
 export default function PortfolioPage() {
+  const router = useRouter();
   const { positions, isLoading, getTotalInvested, getTotalValue, getTotalProfitLoss, refetch } = useUserPositions();
   const { orders, isLoading: ordersLoading, getTotalLocked } = useUserOrders();
   const { address, disconnect } = useWallet();
@@ -47,12 +48,13 @@ export default function PortfolioPage() {
         {/* Top bar */}
         <div className="flex items-center justify-between gap-3 mb-2">
           <div className="flex items-center gap-3">
-            <Link href="/">
-              <button className="nb-button bg-white text-black px-4 py-2 flex items-center gap-2 text-sm">
-                <ArrowLeft className="w-4 h-4" />
-                Back to markets
-              </button>
-            </Link>
+            <button
+              onClick={() => router.push('/')}
+              className="nb-button bg-white text-black px-4 py-2 flex items-center gap-2 text-sm"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to markets
+            </button>
             <div className="px-3 py-1 nb-border bg-yellow-300 font-pixel text-xs uppercase tracking-wide">
               Portfolio
             </div>

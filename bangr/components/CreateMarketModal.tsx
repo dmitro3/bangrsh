@@ -31,6 +31,7 @@ export function CreateMarketModal({ isOpen, onClose }: CreateMarketModalProps) {
     username: string;
     authorName: string;
     avatarUrl: string | null;
+    imageUrl?: string | null;
     text: string;
     tweetId: string;
     quotedTweet?: {
@@ -260,6 +261,7 @@ export function CreateMarketModal({ isOpen, onClose }: CreateMarketModalProps) {
         username: tweetData.authorHandle,
         authorName: tweetData.authorName,
         avatarUrl: tweetData.avatarUrl,
+        imageUrl: (tweetData as any).imageUrl ?? null,
         text: tweetData.text,
         tweetId: tweetData.tweetId,
         quotedTweet: tweetData.quotedTweet || null,
@@ -385,6 +387,16 @@ export function CreateMarketModal({ isOpen, onClose }: CreateMarketModalProps) {
               <p className="text-gray-900 text-base leading-relaxed mb-3 whitespace-pre-wrap">
                 {previewData.text}
               </p>
+
+              {/* Tweet Image (if present) */}
+              {previewData.imageUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={previewData.imageUrl}
+                  alt="Tweet media"
+                  className="w-full nb-border rounded mb-3"
+                />
+              )}
 
                   {/* Quoted Tweet */}
                   {previewData.quotedTweet && (

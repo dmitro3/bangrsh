@@ -40,8 +40,16 @@ export function useUserPositions() {
         chainId
       });
 
-      if (!address || !nextMarketId || !publicClient || tradesLoading) {
+      if (!address || nextMarketId === undefined || !publicClient || tradesLoading) {
         console.log('[useUserPositions] Missing requirements, returning empty');
+        setPositions([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Handle fresh deployment with 0 markets
+      if (Number(nextMarketId) === 0) {
+        console.log('[useUserPositions] No markets exist yet (nextMarketId = 0)');
         setPositions([]);
         setIsLoading(false);
         return;
@@ -220,7 +228,7 @@ export function useUserPositions() {
     }
 
     fetchPositions();
-  }, [address, nextMarketId, chainId, publicClient, marketFactoryAddress, shareTokenAddress, lastUpdate, tradesLoading, getTotalSpent, getAveragePurchasePrice]);
+  }, [address, nextMarketId, chainId, lastUpdate, tradesLoading]);
 
   // Watch for share transfers (when shares are bought, sold, or transferred)
   useWatchContractEvent({

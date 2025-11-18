@@ -19,12 +19,16 @@ export async function GET(request: NextRequest) {
     }
 
     let tweetData;
+    let actualTweetId: string | null = null;
 
     if (marketIdStr) {
       const marketId = parseInt(marketIdStr);
-      tweetData = await prisma.tweetData.findUnique({
+      const result = await prisma.tweetData.findUnique({
         where: { marketId },
+        include: { market: true }, // Include market to get tweetId
       });
+      tweetData = result;
+      actualTweetId = result?.market.tweetId || null;
     } else if (tweetId) {
       const market = await prisma.market.findFirst({
         where: { tweetId },
@@ -32,9 +36,10 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' }, // Get the most recent market for this tweet
       });
       tweetData = market?.tweetData;
+      actualTweetId = market?.tweetId || null;
     }
 
-    if (!tweetData) {
+    if (!tweetData || !actualTweetId) {
       return NextResponse.json(
         { error: "Tweet data not found" },
         { status: 404 }
@@ -55,7 +60,7 @@ export async function GET(request: NextRequest) {
 
     // Return in the format expected by the frontend
     return NextResponse.json({
-      tweetId: tweetData.marketId.toString(),
+      tweetId: actualTweetId,
       text: tweetData.text,
       authorHandle: tweetData.authorHandle,
       authorName: tweetData.authorName,
