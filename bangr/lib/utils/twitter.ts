@@ -37,7 +37,25 @@ export async function fetchTweetMetrics(tweetId: string) {
       throw new Error("Failed to fetch tweet metrics");
     }
 
-    return await response.json();
+    const raw = await response.json();
+
+    // Normalise API response into the shape expected by the UI
+    // The API route returns flat metrics (views, likes, retweets, replies, ...)
+    // while the modal expects a `metrics` object.
+    return {
+      tweetId: raw.tweetId ?? tweetId,
+      text: raw.text ?? "",
+      authorHandle: raw.authorHandle ?? "unknown",
+      authorName: raw.authorName ?? "Unknown",
+      avatarUrl: raw.avatarUrl ?? null,
+      quotedTweet: raw.quotedTweet ?? null,
+      metrics: {
+        views: raw.views ?? 0,
+        likes: raw.likes ?? 0,
+        retweets: raw.retweets ?? 0,
+        replies: raw.replies ?? 0,
+      },
+    };
   } catch (error) {
     console.error("Error fetching tweet metrics:", error);
     throw error;
@@ -48,9 +66,11 @@ export async function fetchTweetMetrics(tweetId: string) {
  * Validate if metrics meet threshold requirements
  */
 export function validateMetricThreshold(
-  metricValue: number,
-  metricType: string
-): boolean {
-  // No minimum thresholds - all metrics are valid
-  return metricValue >= 0;
+  metricType: "views" | "likes" | "retweets" | "replies",
+  metricValue: number
+): { valid: boolean; minRequired: number } {
+  return {
+    valid: true,
+    minRequired: 0,
+  };
 }

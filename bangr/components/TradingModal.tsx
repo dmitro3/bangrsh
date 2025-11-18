@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useWallet } from "@/contexts/WalletContext";
-import { usePositions } from "@/contexts/PositionsContext";
 import { Toast } from "./Toast";
 import confetti from "canvas-confetti";
 
@@ -31,7 +30,6 @@ export function TradingModal({
   color,
 }: TradingModalProps) {
   const { balance, isConnected, spendBalance } = useWallet();
-  const { addPosition } = usePositions();
   const [amount, setAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -69,19 +67,8 @@ export function TradingModal({
       const success = spendBalance(numAmount);
 
       if (success) {
-        // Add position
-        addPosition({
-          marketId,
-          username,
-          displayName,
-          outcome,
-          shares,
-          invested: numAmount,
-          avgPrice,
-          marketTitle,
-          currentPrice,
-          color,
-        });
+        // Note: This component is deprecated - use TradeWidget instead
+        // Position tracking is handled by blockchain state
 
         // Fire confetti
         confetti({

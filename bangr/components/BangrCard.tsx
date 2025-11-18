@@ -49,8 +49,7 @@ const BangrCard: React.FC<BangrCardProps> = ({
   targetValue
 }) => {
   const metricColor = metricStrokeColors[trendingMetric] || "#000000";
-  const tagKey = tag.toUpperCase();
-  const tagEmoji = tagEmojis[tagKey] || "";
+  const metricLabel = trendingMetric.toUpperCase();
 
   return (
     <div className={`${color} nb-border nb-shadow flex flex-col nb-pattern-dots`}>
@@ -118,16 +117,38 @@ const BangrCard: React.FC<BangrCardProps> = ({
           className="w-full h-auto nb-border mb-3"
         />
         {/* Tweet Stats */}
-        <div className="flex justify-between text-sm text-neutral-600">
-          <span>1.2K Comments</span>
-          <span className="mx-2">3.8K Retweets</span>
-          <span>8.9K Likes</span>
+        <div className="grid grid-cols-4 gap-1 mt-2 text-[11px] text-neutral-700">
+          <div className="text-center">
+            <div className="font-semibold">1.2K</div>
+            <div>Comments</div>
+          </div>
+          <div className="text-center">
+            <div className="font-semibold">3.8K</div>
+            <div>Retweets</div>
+          </div>
+          <div className="text-center">
+            <div className="font-semibold">8.9K</div>
+            <div>Likes</div>
+          </div>
+          <div className="text-center">
+            <div className="font-semibold">2.5M</div>
+            <div>Views</div>
+          </div>
         </div>
       </div>
 
       {/* Prediction Question */}
       <div className="p-3 border-y-2 border-black font-bold text-center text-sm bg-yellow-400 text-black font-pixel nb-scanlines relative z-10">
-        Will this hit {targetValue} VIEWS in 24h?
+        Will this hit {targetValue}{" "}
+        <span
+          className="underline"
+          style={{
+            color: metricColor,
+          }}
+        >
+          {metricLabel}
+        </span>{" "}
+        in 24h?
       </div>
 
       {/* Prediction Actions */}

@@ -39,7 +39,7 @@ export function useApprovalFlow({
   });
 
   // Check current allowance
-  const { data: allowance, refetch: refetchAllowance } = useReadContract({
+  const { refetch: refetchAllowance } = useReadContract({
     address: tokenAddress,
     abi: [
       {
@@ -54,7 +54,8 @@ export function useApprovalFlow({
       },
     ],
     functionName: "allowance",
-    args: [tokenAddress, spenderAddress], // Note: This needs user address, will be passed in execute
+    // We'll override args at call time via refetchAllowance(userAddress, spenderAddress)
+    args: [tokenAddress, spenderAddress],
     query: {
       enabled: false, // We'll manually trigger this
     },
@@ -90,8 +91,11 @@ export function useApprovalFlow({
       try {
         setError(null);
 
-        // Check allowance first
-        const currentAllowance = allowance as bigint | undefined;
+        // Check allowance first for this user
+        const allowanceResult = await refetchAllowance({
+          args: [userAddress, spenderAddress],
+        });
+        const currentAllowance = allowanceResult.data as bigint | undefined;
 
         if (!currentAllowance || currentAllowance < requiredAmount) {
           // Need approval
@@ -124,15 +128,7 @@ export function useApprovalFlow({
         setTxStep("idle");
       }
     },
-    [
-      enabled,
-      allowance,
-      requiredAmount,
-      tokenAddress,
-      spenderAddress,
-      writeApprove,
-      onActionExecute,
-    ]
+    [enabled, requiredAmount, spenderAddress, writeApprove, onActionExecute, refetchAllowance]
   );
 
   const reset = useCallback(() => {

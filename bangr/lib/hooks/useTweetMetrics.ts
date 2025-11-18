@@ -1,16 +1,21 @@
 import { useState, useEffect } from "react";
 
-interface TweetMetrics {
+interface TweetMetricsResponse {
+  tweetId: string;
+  text: string;
+  authorHandle: string;
+  authorName: string;
+  avatarUrl?: string | null;
+  views: number;
   likes: number;
   retweets: number;
   replies: number;
-  views: number;
-  bookmarks: number;
-  quotes: number;
+  quotes?: number;
+  bookmarks?: number;
 }
 
 export function useTweetMetrics(tweetId: string | undefined) {
-  const [metrics, setMetrics] = useState<TweetMetrics | null>(null);
+  const [data, setData] = useState<TweetMetricsResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -33,8 +38,8 @@ export function useTweetMetrics(tweetId: string | undefined) {
           throw new Error("Failed to fetch metrics");
         }
 
-        const data = await response.json();
-        setMetrics(data);
+        const json = await response.json();
+        setData(json as TweetMetricsResponse);
       } catch (err) {
         setError(err as Error);
         console.error("Error fetching tweet metrics:", err);
@@ -46,5 +51,5 @@ export function useTweetMetrics(tweetId: string | undefined) {
     fetchMetrics();
   }, [tweetId]);
 
-  return { metrics, isLoading, error };
+  return { data, isLoading, error };
 }

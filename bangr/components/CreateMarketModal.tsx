@@ -8,6 +8,7 @@ import { ADDRESSES, MARKET_FACTORY_ABI, ERC20_ABI } from "@/lib/contracts";
 import { formatViews } from "@/lib/utils/formatting";
 import { useApprovalFlow } from "@/lib/hooks/useApprovalFlow";
 import { fetchTweetMetrics, validateMetricThreshold } from "@/lib/utils/twitter";
+import confetti from "canvas-confetti";
 
 interface CreateMarketModalProps {
   isOpen: boolean;
@@ -146,8 +147,6 @@ export function CreateMarketModal({ isOpen, onClose }: CreateMarketModalProps) {
     }
   };
 
-  if (!isOpen) return null;
-
   const handleUrlChange = async (url: string) => {
     setTweetUrl(url);
     setError(null);
@@ -164,17 +163,11 @@ export function CreateMarketModal({ isOpen, onClose }: CreateMarketModalProps) {
     try {
       const tweetData = await fetchTweetMetrics(parsed.tweetId);
 
-      // Validate that at least one metric meets minimum thresholds
+      // Validate metrics (currently no minimum thresholds; all metrics are allowed)
       const viewsValid = validateMetricThreshold('views', tweetData.metrics.views);
       const likesValid = validateMetricThreshold('likes', tweetData.metrics.likes);
       const retweetsValid = validateMetricThreshold('retweets', tweetData.metrics.retweets);
       const repliesValid = validateMetricThreshold('replies', tweetData.metrics.replies);
-
-      if (!viewsValid.valid && !likesValid.valid && !retweetsValid.valid && !repliesValid.valid) {
-        setError("Tweet doesn't meet minimum requirements for any metric. Need: 10K views OR 500 likes OR 100 retweets OR 50 replies.");
-        setIsFetchingTweet(false);
-        return;
-      }
 
       // Set preview data with all metrics
       const metricsData = {
@@ -208,11 +201,8 @@ export function CreateMarketModal({ isOpen, onClose }: CreateMarketModalProps) {
         metrics: metricsData,
       });
 
-      // Auto-select first available metric
-      if (viewsValid.valid) setSelectedMetric('views');
-      else if (likesValid.valid) setSelectedMetric('likes');
-      else if (retweetsValid.valid) setSelectedMetric('retweets');
-      else if (repliesValid.valid) setSelectedMetric('replies');
+      // Auto-select views by default (or first metric)
+      setSelectedMetric('views');
     } catch (err: any) {
       console.error("Error fetching tweet:", err);
       setError(err.message || "Failed to fetch tweet data. Please check the URL and try again.");
@@ -234,6 +224,8 @@ export function CreateMarketModal({ isOpen, onClose }: CreateMarketModalProps) {
 
     try {
       await execute(address);
+      // Approval + create flow will update txStep via useApprovalFlow.
+      // When txStep moves to "success" we can show confetti.
     } catch (err: any) {
       console.error("Transaction error:", err);
       setError(err.message || "Transaction failed");
@@ -242,7 +234,19 @@ export function CreateMarketModal({ isOpen, onClose }: CreateMarketModalProps) {
 
   const isLoading = isApprovalLoading || isCreatePending || isCreateConfirming;
 
-  // formatViews moved to @/lib/utils/formatting
+  // Fire confetti when market creation succeeds
+  useEffect(() => {
+    if (isCreateSuccess && txStep === "success") {
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ["#22c55e", "#4ade80", "#bbf7d0"],
+      });
+    }
+  }, [isCreateSuccess, txStep]);
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -320,21 +324,33 @@ export function CreateMarketModal({ isOpen, onClose }: CreateMarketModalProps) {
             {/* Metric Selection */}
             {Object.entries(previewData.metrics).map(([key, metric]) => {
               const metricKey = key as MetricType;
-              if (!metric.available) return null;
+              const isSelected = selectedMetric === metricKey;
+              const cardColor = isSelected ? "bg-yellow-200" : "bg-neutral-100";
+
               return (
-                <div key={metricKey} onClick={() => setSelectedMetric(metricKey)} className={`p-4 nb-border cursor-pointer ${selectedMetric === metricKey ? 'bg-yellow-200' : 'bg-neutral-100'}`}>
+                <div
+                  key={metricKey}
+                  onClick={() => setSelectedMetric(metricKey)}
+                  className={`p-4 nb-border cursor-pointer ${cardColor}`}
+                >
                   <div className="flex items-start gap-3">
                     <input
                       type="radio"
                       name="metric"
-                      checked={selectedMetric === metricKey}
+                      checked={isSelected}
                       onChange={() => setSelectedMetric(metricKey)}
                       className="mt-1 w-5 h-5"
                     />
                     <div className="flex-1">
-                      <p style={{ fontWeight: 700 }} className="mb-1">{metricKey.charAt(0).toUpperCase() + metricKey.slice(1)}</p>
+                      <p style={{ fontWeight: 700 }} className="mb-1">
+                        {metricKey.charAt(0).toUpperCase() + metricKey.slice(1)}
+                      </p>
                       <p className="text-sm text-gray-700 mb-2">
-                        Will this hit <span style={{ fontWeight: 600 }}>{formatViews(metric.target)}</span> {metricKey} in 24h?
+                        Will this hit{" "}
+                        <span style={{ fontWeight: 600 }}>
+                          {formatViews(metric.target)}
+                        </span>{" "}
+                        {metricKey} in 24h?
                       </p>
                       <div className="flex items-center gap-3 text-xs text-gray-600">
                         <span>Current: {formatViews(metric.current)}</span>
@@ -344,7 +360,7 @@ export function CreateMarketModal({ isOpen, onClose }: CreateMarketModalProps) {
                     </div>
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         )}
@@ -361,11 +377,6 @@ export function CreateMarketModal({ isOpen, onClose }: CreateMarketModalProps) {
               <li>• Market runs for <span style={{ fontWeight: 600 }}>24 hours</span></li>
               <li>• Cost: <span style={{ fontWeight: 600 }}>10 USDC</span></li>
             </ul>
-            <div className="mt-3 p-2 bg-blue-50 rounded-lg">
-              <p className="text-xs text-gray-700">
-                <span style={{ fontWeight: 600 }}>Minimum thresholds:</span> Views: 10K | Likes: 500 | Retweets: 100 | Replies: 50
-              </p>
-            </div>
           </div>
         )}
 

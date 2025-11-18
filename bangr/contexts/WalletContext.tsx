@@ -2,7 +2,8 @@
 
 import { createContext, useContext, ReactNode, useState, useEffect } from "react";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
+import { useUSDCBalance } from "@/lib/hooks/useMarketData";
 
 interface WalletContextType {
   isConnected: boolean;
@@ -27,6 +28,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 export function useWallet(): WalletContextType {
   const { login, logout, authenticated, ready, user } = usePrivy();
   const { address: wagmiAddress, isConnected: wagmiConnected } = useAccount();
+  const chainId = useChainId() || 97;
   const { wallets, ready: walletsReady } = useWallets();
   const [mounted, setMounted] = useState(false);
   const [showCustomModal, setShowCustomModal] = useState(false);
@@ -84,7 +86,17 @@ export function useWallet(): WalletContextType {
   // Prevent hydration mismatch by only showing connected state on client
   const isConnected = mounted && authenticated && ready && !!wagmiAddress;
   const address = mounted && wagmiAddress ? wagmiAddress : "";
-  const balance = isConnected ? 1000 : 0; // Mock balance for now
+
+  // Real on-chain USDC balance instead of mock.
+  // Always call the hook with a stable address to respect Rules of Hooks.
+  const zeroAddress = "0x0000000000000000000000000000000000000000" as `0x${string}`;
+  const usdcOwner = (wagmiAddress as `0x${string}`) || zeroAddress;
+  const { balance: usdcBalance } = useUSDCBalance(usdcOwner, chainId);
+
+  const balance =
+    isConnected && usdcBalance !== undefined
+      ? Number((usdcBalance as bigint) / BigInt(1_000_000))
+      : 0;
 
   const connect = async () => {
     console.log('[useWallet] connect() called', {

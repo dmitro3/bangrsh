@@ -4,13 +4,13 @@ import abisData from "./abis.json";
 // Export address utilities
 export { getContractAddress, contracts };
 
-// Create a dynamic ADDRESSES object based on current chain
+// Currently target BNB Testnet (chainId 97). Update here if you change networks.
 export const ADDRESSES = {
-  MARKET_FACTORY: getContractAddress(1337, "marketFactory") as `0x${string}`,
-  ORDER_BOOK: getContractAddress(1337, "orderBook") as `0x${string}`,
-  SHARE_TOKEN: getContractAddress(1337, "shareToken") as `0x${string}`,
-  USDC: getContractAddress(1337, "usdc") as `0x${string}`,
-  ORACLE: getContractAddress(1337, "oracle") as `0x${string}`,
+  MARKET_FACTORY: getContractAddress(97, "marketFactory") as `0x${string}`,
+  ORDER_BOOK: getContractAddress(97, "orderBook") as `0x${string}`,
+  SHARE_TOKEN: getContractAddress(97, "shareToken") as `0x${string}`,
+  USDC: getContractAddress(97, "usdc") as `0x${string}`,
+  ORACLE: getContractAddress(97, "oracle") as `0x${string}`,
 };
 
 // Export ABIs

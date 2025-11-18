@@ -38,9 +38,18 @@ export function Header({ onCreateClick }: HeaderProps) {
           {isConnected ? (
             <>
               {/* Connected State */}
-              <div className="nb-border nb-shadow bg-white px-3 py-2 text-center">
-                <div className="text-[10px] text-neutral-600 font-semibold">BALANCE</div>
-                <div className="font-bold text-sm">${balance.toFixed(2)}</div>
+              <div className="flex flex-col sm:flex-row items-stretch gap-3">
+                <div className="nb-border nb-shadow bg-white px-3 py-2 text-center min-w-[110px]">
+                  <div className="text-[10px] text-neutral-600 font-semibold">
+                    BALANCE
+                  </div>
+                  <div className="font-bold text-sm">
+                    ${balance.toFixed(2)}
+                  </div>
+                </div>
+
+                {/* Quick mint for dev/testnet */}
+                <MintUSDCButton className="nb-button bg-green-400 text-black px-3 py-2 text-[11px] font-pixel whitespace-nowrap" />
               </div>
 
               {address && (

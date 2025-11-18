@@ -125,8 +125,8 @@ contract MarketFactory is Ownable, ReentrancyGuard {
         // Validate multiplier
         require(validMultipliers[multiplier], "Invalid multiplier");
 
-        // Validate minimum thresholds
-        _validateThreshold(metric, currentValue);
+        // NOTE: Threshold validation disabled for now to allow markets on any tweet/metric
+        // _validateThreshold(metric, currentValue);
 
         // Check market uniqueness
         bytes32 marketHash = keccak256(abi.encode(tweetId, metric, duration, multiplier));
